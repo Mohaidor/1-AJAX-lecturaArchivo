@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Ejercicio 1 - Estados de la petición AJAX</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <form action="#">
+    URL:
+    <input type="text" id="recurso" size="70" placeholder="documento.txt"/>
+    <input type="button" id="enviar" value="Mostrar contenidos" />
+  </form>
+
+  <div id="principal">
+    <h2>Contenidos del archivo:</h2>
+    <div id="contenidos"></div>
+
+
+  </div>
+
+  <div id="secundario">
+    <h2>Estados de la petición:</h2>
+    <div id="estados"></div>
+
+    <h2>Código de estado:</h2>
+    <div id="codigo"></div>
+  </div>
+  <script type="text/javascript" src="code.js"></script>
+</body>
+</html>

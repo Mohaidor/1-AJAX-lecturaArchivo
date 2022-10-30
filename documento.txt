@@ -1,0 +1,257 @@
+Hola 
+
+
+XMLHttpRequest Level 2 user guide
+
+
+XMLHttpRequest is a web browser interface, it makes it possible for JavaScript doing HTTP(s) communication. Microsoft's IE5 first introduced XMLHttpRequest, because it's so useful that many other browsers also adopted this. AJAX came to the front since.
+
+However, this interface is not standardized, implementation among different browsers is different, with the emerging of HTML5, W3C is considering to standardize this interface. In February 2008, they proposed a XMLHttpRequest Level 2 draft.
+
+This new version of XMLHttpRequest proposes many new functions, it will push the evolution of Internet. Here we introduce some new functiosn of the new XMLHttpRequest.
+
+1. Old XMLHttpRequest object
+
+Before introducing the new version, lets get back to the old XMLHttpRequest.
+
+First, create a new XMLHttpRequest instance.
+
+　　var xhr = new XMLHttpRequest();
+
+then send a request to the remote server
+
+　　xhr.open('GET', 'example.php');
+
+　　xhr.send();
+
+after that wait for server response. Now we need to monitor the status change of XMLHttpRequest and set the callback function.
+
+　　xhr.onreadystatechange = function(){
+
+　　　　if ( xhr.readyState == 4 && xhr.status == 200 ) {
+
+　　　　　　alert( xhr.responseText );
+
+　　　　} else {
+
+　　　　　　alert( xhr.statusText );
+
+　　　　}
+
+　　};
+
+The above codes contain major properties of the old XMLHttpRequest object.
+
+xhr.readyState : Status of XMLHttpRequest object, when it's 4, it means data receive is completed.
+xhr.status : Status code sent by the server, when it's 200, it means status OK
+xhr.responseText : Text data sent by the server
+xhr.responseXML : XML data sent by the server
+xhr.statusText : Status text sent by the server
+2. Disadvantages of the old version
+
+The old XMLHttpRequest has following drawbacks:
+
+Only support text data transmission, cannot read and upload binary file
+No progress information while sending and receiving data. Only show whether complete or not
+Due to same origin policy, can only request data from the same server
+3. New functions of the new version
+
+The new XMLHttpRequest object made some major improvements respect to the old version
+
+Can set HTTP request timeout
+Can use FormData object to manage form data
+Can upload file
+Can request data from different servers
+Can receive binary data from server
+Can receive progress information of data transmission
+Next we will introduce these new functions
+
+4. HTTP request timeout
+
+Sometimes AJAX operation may take long time, and we cannot expect how much more time is needed, if you have a poor network connection, then you may need to wait for a long time.
+
+The new XMLHttpRequest object adds the timeout property which is to set the timeout.
+
+　　xhr.timeout = 3000;
+
+statement above will set the wait timeout as 3000 milliseconds(3 seconds), after 3 seconds, it will stop the HTTP request, there is also a timeout event corresponding to this property,which is to set the timeout callback function.
+
+　 xhr.ontimeout = function(event){
+
+　　　　alert('Request timeout');
+
+　　}
+
+As of now Opera, Firefox and IE 10 supports this property, IE8 and IE9's XDomainRequest object supports this property as well, unfortunately, Chrome and Safari doesn't support this property.
+
+5. FormData object
+
+AJAX is frequently used to transmit form data, in order to ease the form data processing, HTML5 adds a new FormData object which can simulate a form.
+
+First, create a FormData object
+
+　　var formData = new FormData();
+
+Then add form fields
+
+　　formData.append('username', 'John');
+
+　　formData.append('id', 123456);
+
+Finally, directly send the FormData object, it has the same effect of submitting the form
+
+　　xhr.send(formData);
+
+FormData object can also be used to receivd the form data from the webpage's form element.
+
+   var form = document.getElementById('myform');
+
+　　var formData = new FormData(form);
+
+　　formData.append('secret', '123456'); // Add new form field
+
+　　xhr.open('POST', form.action);
+
+　　xhr.send(formData);
+
+6. File upload
+
+The new XMLHttpRequest object not only supports text data transmission, but also supports file upload
+
+Assume files is a file field <input type="file" >, we load it into the FormData object
+
+　 var formData = new FormData();
+
+　　for (var i = 0; i < files.length;i++) {
+
+　　　　formData.append('files[]', files[i]);
+
+　　}
+
+then send this object
+
+　　xhr.send(formData);
+
+that's it, simple enough.
+
+7. Cross-origin resource sharing
+
+The new XMLHttpRequest object can send requests to different servers. This si called cross-origin resource sharing(CORS).
+
+The premise of using CORS is that browsers should support this, and the server should agree this cross-origin request.
+
+　　xhr.open('GET', 'http://other.server/and/path/to/script');
+
+Except IE8 and IE9, all mainstream browsers now support CORS, IE 10 will also support this, regarding the configuration on server side, please refer 《Server-Side Access Control》.
+
+8. Receive binary data (Method A : overwrite MIMEType)
+
+The old XMLHttpRequest can only receive text data from the server, the new XMLHttpRequest can receive binary data.
+
+There are two methods to achieve this. The old method is to overwrite MIMEType, treat the binary data sent by the server as text data, but notify the browser to use customized charset.
+
+    xhr.overrideMimeType("text/plain; charset=x-user-defined");
+
+Then use responseText to receive binary data
+
+    var binStr = xhr.responseText;
+
+Since now the data is treated as text, need to convert them to binary data
+
+　 for (var i = 0, len = binStr.length; i < len; ++i) {
+
+　　　　var c = binStr.charCodeAt(i);
+
+　　　　var byte = c & 0xff;
+
+　　}
+
+8. Receive binary data (Method B : responseType property)
+
+The default rerponseType is TEXT, we can change this to other types in the new XMLHttpRequest object.
+
+By setting it to blob, we can receive binary data from server
+
+　  var xhr = new XMLHttpRequest();
+
+　　xhr.open('GET', '/path/to/image.png');
+
+　　xhr.responseType = 'blob';
+
+When receiving data, we can use the Blob object to store them
+
+　　var blob = new Blob([xhr.response], {type: 'image/png'});
+
+Note, here we read xhr.response, not xhr.responseText.
+
+You can also set responseType to arraybuffer, then the binar data can be stored in an array.
+
+　　var xhr = new XMLHttpRequest();
+
+　　xhr.open('GET', '/path/to/image.png');
+
+　　xhr.responseType = "arraybuffer";
+
+We need to traverse the array to process the data
+
+　　var arrayBuffer = xhr.response;
+
+　　if (arrayBuffer) {
+
+　　　　var byteArray = new Uint8Array(arrayBuffer);
+
+　　　　for (var i = 0; i < byteArray.byteLength; i++) {
+
+　　　　　　// do something
+
+　　　　}
+　　}
+
+For details, please refer to : Sending and Receiving Binary Data.
+
+9. Progress information
+
+There is a progress event in the new XMLHttpRequest object, it can send back the progress information.
+
+There are two possibilities for progress : Download progress and upload progress. The progress event for downloading belongs to XMLHttpRequest object, while progress event for uploading belongs to XMLHttpRequest.upload object.
+
+We can set callback function for progress event
+
+　　xhr.onprogress = updateProgress;
+
+　　xhr.upload.onprogress = updateProgress;
+
+In callback function, we use someproperties of the progress event
+
+　function updateProgress(event) {
+
+　　　　if (event.lengthComputable) {
+
+　　　　　　var percentComplete = event.loaded / event.total;
+
+　　　　}
+
+　　}
+
+In above codes, event.total refers to the total bytes to be transferred, event.loaded means bytes transferred, if event.lengthComputable is false, then event.total will be 0.
+
+There are five other events related to progress event.
+
+load event : transfer successfully completed
+abort event : transfer is cancelled by user
+error event : error in transfer
+loadstart event : transfer begins
+loadend event : transfer completes, but not sure success or not
+10. Reading materials
+
+   1. Introduction to XMLHttpRequest Level 2：
+
+　　2. New Tricks in XMLHttpRequest 2：
+
+　　3. Using XMLHttpRequest：
+
+　　4. HTTP Access Control：
+
+　　5. DOM access control using cross-origin resource sharing：
+
+　　6. Server-Side Access Control：
