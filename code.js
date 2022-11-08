@@ -17,7 +17,7 @@ function checkUrl() {
     if (/^\s*$/.test(url)) {
         alert('La URL no puede estar vacía');
         return
-    }else if (!/^.*\.[a-z0-9]{1,4}$/gi.test(url)) {
+    } else if (!/^.*\.[a-z0-9]{1,4}$/gi.test(url)) {
         alert('Vaya... parce que la URL no es correcta');
         return
     }
@@ -27,20 +27,23 @@ function checkUrl() {
 
 function solicitudAjax() {
     let urlOk = checkUrl();
-    ajax = new XMLHttpRequest();//Instanciamos XHR
-    ajax.addEventListener("load", mostrar, false); //Se lanza al completarse con éxito
-    ajax.addEventListener("loadend", final, false);//Se lanza al completar la solicitud
-    ajax.addEventListener("readystatechange", cambio, false);//Se lanza cuando cambia el valor de la propiedad readyState
-    ajax.open("GET", urlOk, true);//Método GET, recupera el fichero documento.txt
-    ajax.send();//Método SEND, como es GET está vacío. Inicia la solicitud AJAX
+    if (urlOk) {
+        ajax = new XMLHttpRequest();//Instanciamos XHR
+        ajax.addEventListener("load", mostrar, false); //Se lanza al completarse con éxito
+        ajax.addEventListener("loadend", final, false);//Se lanza al completar la solicitud
+        ajax.addEventListener("readystatechange", cambio, false);//Se lanza cuando cambia el valor de la propiedad readyState
+        ajax.open("GET", urlOk, true);//Método GET, recupera el fichero documento.txt
+        ajax.send();//Método SEND, como es GET está vacío. Inicia la solicitud AJAX
+    }
+
 }
 
 function borraContenidos() {
-    let divs =document.querySelectorAll('#contenidos, #estados, #codigo')
+    let divs = document.querySelectorAll('#contenidos, #estados, #codigo')
     divs.forEach(element => {
-        element.innerHTML="";
+        element.innerHTML = "";
     });
-    
+
 }
 
 
@@ -78,12 +81,12 @@ function cambio() {
         case 4:
             p.appendChild(document.createTextNode(ajax.readyState + ': petición finalizada, respuesta preparda'))
             break;
-    
+
         default:
             p.appendChild(document.createTextNode(ajax.readyState))
             break;
     }
-    
+
     estadoPeticion.appendChild(p);
 }
 function final() {
